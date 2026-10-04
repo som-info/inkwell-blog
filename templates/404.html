@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Page not found{% endblock %}
+{% block content %}
+  <div class="empty">
+    <p class="big">404</p>
+    <h1>Page not found</h1>
+    <p>The page you were looking for doesn't exist or has been moved.</p>
+    <p><a class="btn" href="{% url 'blog:post_list' %}">Back to the blog</a></p>
+  </div>
+{% endblock %}

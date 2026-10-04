@@ -1,0 +1,74 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Inkwell{% endblock %} · Inkwell</title>
+  <meta name="description" content="{% block description %}Inkwell — a blog about web development, design and building things for the web.{% endblock %}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23b4532a'/><text x='16' y='23' text-anchor='middle' font-family='Georgia' font-size='20' fill='white'>I</text></svg>">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="logo" href="{% url 'blog:post_list' %}"><span class="logo-mark" aria-hidden="true">✒</span> Inkwell</a>
+      <form class="search" action="{% url 'blog:search' %}" method="get" role="search">
+        <label class="sr-only" for="q">Search posts</label>
+        <input id="q" type="search" name="q" placeholder="Search posts…" value="{{ query|default:'' }}" maxlength="100">
+        <button type="submit" aria-label="Search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        </button>
+      </form>
+    </div>
+  </header>
+
+  <div class="wrap layout">
+    <main id="content" class="main">
+      {% if messages %}
+        <ul class="messages" role="status">
+          {% for message in messages %}<li class="msg msg-{{ message.tags }}">{{ message }}</li>{% endfor %}
+        </ul>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+
+    <aside class="sidebar" aria-label="Blog navigation">
+      <section class="widget">
+        <h2>About</h2>
+        <p>Inkwell is a small blog about web development, design and the craft of building for the web.</p>
+      </section>
+      {% if sidebar_categories %}
+      <section class="widget">
+        <h2>Categories</h2>
+        <ul class="cat-list">
+          {% for c in sidebar_categories %}
+            <li><a href="{{ c.get_absolute_url }}"{% if active_category == c %} aria-current="page"{% endif %}>{{ c.name }}</a> <span class="count">{{ c.num_posts }}</span></li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+      {% if sidebar_tags %}
+      <section class="widget">
+        <h2>Tags</h2>
+        <ul class="tag-cloud">
+          {% for t in sidebar_tags %}<li><a class="tag{% if active_tag == t %} active{% endif %}" href="{{ t.get_absolute_url }}">#{{ t.name }}</a></li>{% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+      {% if sidebar_recent %}
+      <section class="widget">
+        <h2>Recent posts</h2>
+        <ul class="recent">
+          {% for p in sidebar_recent %}<li><a href="{{ p.get_absolute_url }}">{{ p.title }}</a><time datetime="{{ p.published_at|date:'c' }}">{{ p.published_at|date:"M j, Y" }}</time></li>{% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+    </aside>
+  </div>
+
+  <footer class="site-footer">
+    <div class="wrap">© {% now "Y" %} Inkwell · Built with Django · <a href="{% url 'admin:index' %}">Admin</a></div>
+  </footer>
+</body>
+</html>
