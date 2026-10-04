@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block description %}{{ post.excerpt }}{% endblock %}
+{% block content %}
+<article class="post">
+  <header>
+    <div class="meta">
+      {% if post.category %}<a class="cat" href="{{ post.category.get_absolute_url }}">{{ post.category.name }}</a>{% endif %}
+      <time datetime="{{ post.published_at|date:'c' }}">{{ post.published_at|date:"F j, Y" }}</time>
+      <span>· {{ post.reading_time }} min read</span>
+      {% if post.status == "draft" %}<span class="badge">Draft preview</span>{% endif %}
+    </div>
+    <h1>{{ post.title }}</h1>
+    <p class="byline">By {{ post.author.get_full_name|default:post.author.username }}</p>
+  </header>
+  <div class="post-body">{{ post.body|linebreaks }}</div>
+  {% if post.tags.all %}
+    <ul class="tag-cloud">{% for t in post.tags.all %}<li><a class="tag" href="{{ t.get_absolute_url }}">#{{ t.name }}</a></li>{% endfor %}</ul>
+  {% endif %}
+  <nav class="post-nav" aria-label="More posts">
+    {% if previous_post %}<a href="{{ previous_post.get_absolute_url }}"><small>← Previous</small>{{ previous_post.title }}</a>{% else %}<span></span>{% endif %}
+    {% if next_post %}<a class="next" href="{{ next_post.get_absolute_url }}"><small>Next →</small>{{ next_post.title }}</a>{% endif %}
+  </nav>
+</article>
+
+{% if related %}
+<section class="related">
+  <h2>More in {{ post.category.name }}</h2>
+  <ul>{% for r in related %}<li><a href="{{ r.get_absolute_url }}">{{ r.title }}</a></li>{% endfor %}</ul>
+</section>
+{% endif %}
+
+<section class="comments" id="comments">
+  <h2>{{ comments|length }} comment{{ comments|length|pluralize }}</h2>
+  {% for c in comments %}
+    <div class="comment">
+      <div class="avatar" aria-hidden="true">{{ c.name|first|upper }}</div>
+      <div>
+        <p class="comment-meta"><strong>{{ c.name }}</strong> <time datetime="{{ c.created_at|date:'c' }}">{{ c.created_at|date:"M j, Y" }}</time></p>
+        <div class="comment-body">{{ c.body|linebreaks }}</div>
+      </div>
+    </div>
+  {% empty %}
+    <p class="muted">No comments yet — be the first to share your thoughts.</p>
+  {% endfor %}
+
+  <form class="comment-form" method="post" action="{{ post.get_absolute_url }}#comments" novalidate>
+    {% csrf_token %}
+    <h3>Leave a comment</h3>
+    <p class="muted">Comments are moderated and appear after approval. Your email is never published.</p>
+    {% if form.non_field_errors %}<div class="field-error">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="row">
+      {% for field in form %}{% if field.name != "body" and field.name != "website" %}
+        <div class="field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% for e in field.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
+        </div>
+      {% endif %}{% endfor %}
+    </div>
+    <div class="field">
+      <label for="{{ form.body.id_for_label }}">{{ form.body.label }}</label>
+      {{ form.body }}
+      {% for e in form.body.errors %}<p class="field-error">{{ e }}</p>{% endfor %}
+    </div>
+    <div class="hp" aria-hidden="true"><label for="{{ form.website.id_for_label }}">Website</label>{{ form.website }}</div>
+    <button class="btn" type="submit">Post comment</button>
+  </form>
+</section>
+{% endblock %}

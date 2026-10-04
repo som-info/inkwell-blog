@@ -1,0 +1,12 @@
+<article class="post-card">
+  <div class="meta">
+    {% if post.category %}<a class="cat" href="{{ post.category.get_absolute_url }}">{{ post.category.name }}</a>{% endif %}
+    <time datetime="{{ post.published_at|date:'c' }}">{{ post.published_at|date:"M j, Y" }}</time>
+    <span>· {{ post.reading_time }} min read</span>
+  </div>
+  <h2><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h2>
+  <p>{{ post.excerpt }}</p>
+  {% if post.tags.all %}
+    <ul class="tag-cloud small">{% for t in post.tags.all %}<li><a class="tag" href="{{ t.get_absolute_url }}">#{{ t.name }}</a></li>{% endfor %}</ul>
+  {% endif %}
+</article>
